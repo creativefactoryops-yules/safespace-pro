@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="SafeSpace Pro - Advanced surveillance detection app">
+    <title>SafeSpace Pro - Privacy Detection Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            max-width: 100%;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        
+        .pro-badge {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Threat Level */
+        .threat-level {
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .threat-safe {
+            background: linear-gradient(135deg, #0f766e, #065f46);
+        }
+        
+        .threat-warning {
+            background: linear-gradient(135deg, #c2410c, #9a3412);
+        }
+        
+        .threat-danger {
+            background: linear-gradient(135deg, #991b1b, #7f1d1d);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+        
+        .threat-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+        
+        .threat-level h2 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .threat-level p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            padding: 20px;
+            background: #0a0a0a;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .action-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        .action-icon {
+            font-size: 28px;
+        }
+        
+        .action-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+        
+        .status-indicator.warning {
+            background: #f59e0b;
+            animation: blink 1s infinite;
+        }
+        
+        .status-indicator.danger {
+            background: #ef4444;
+            animation: blink 0.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* Scanner Views */
+        .scanner-view {
+            display: none;
+            min-height: 100vh;
+            background: #0a0a0a;
+        }
+        
+        .scanner-view.active {
+            display: block;
+        }
+        
+        .scanner-header {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .scanner-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .scanner-content {
+            padding: 20px;
+        }
+        
+        /* Video Display */
+        .video-wrapper {
+            position: relative;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        
+        video {
+            width: 100%;
+            display: block;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 20px;
+        }
+        
+        .overlay-icon {
+            font-size: 48px;
+        }
+        
+        .overlay-text {
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        /* Detection Overlay */
+        .detection-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        .detection-marker {
+            position: absolute;
+            border: 2px solid #ef4444;
+            border-radius: 50%;
+            animation: ping 1s infinite;
+        }
+        
+        @keyframes ping {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Info Cards */
+        .info-card {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .info-card h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #93c5fd;
+        }
+        
+        .info-card ul {
+            list-style: none;
+            font-size: 13px;
+        }
+        
+        .info-card li {
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .info-card li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+        }
+        
+        .warning-card {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        .warning-card h3 {
+            color: #fca5a5;
+        }
+        
+        .warning-card li:before {
+            color: #ef4444;
+        }
+        
+        /* Analysis Results */
+        .analysis-result {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .result-status {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .result-safe {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .result-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        
+        .result-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .result-data {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        /* Audio Visualizer */
+        .visualizer-container {
+            background: #000;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+        }
+        
+        /* Evidence Log */
+        .evidence-log {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .evidence-item {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .evidence-item.high {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .evidence-item.medium {
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .evidence-info {
+            flex: 1;
+        }
+        
+        .evidence-type {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+        
+        .evidence-message {
+            font-size: 14px;
+            margin: 4px 0;
+        }
+        
+        .evidence-time {
+            font-size: 11px;
+            opacity: 0.5;
+        }
+        
+        .evidence-action {
+            padding: 6px 12px;
+            background: rgba(59, 130, 246, 0.2);
+            border: none;
+            border-radius: 6px;
+            color: #3b82f6;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Hide elements */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🛡️</div>
+                    <div>
+                        <h1>SafeSpace</h1>
+                        <div class="pro-badge">PRO</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="dashboard">
+            <!-- Threat Level -->
+            <div class="threat-level threat-safe" id="threatLevel">
+                <div class="threat-icon">✓</div>
+                <h2>Environment Secure</h2>
+                <p>No threats detected</p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="section-title">Detection Tools</div>
+                <div class="action-grid">
+                    <button class="action-btn" onclick="app.openScanner('ir')">
+                        <span class="status-indicator" id="statusIr"></span>
+                        <div class="action-icon">📷</div>
+                        <div class="action-label">IR Camera<br>Detector</div>
+                    </button>
+                    
+                    <button class="action-btn" onclick="app.openScanner('lens')">
+                        <span class="status-indicator" id="statusLens"></span>
+                        <div class="action-icon">🔍</div>
+                        <div class="action-label">Lens<br>Finder</div>
+                    </button>
+                    
+                    <button class="action-btn" onclick="app.openScanner('audio')">
+                        <span class="status-indicator" id="statusAudio"></span>
+                        <div class="action-icon">🎵</div>
+                        <div class="action-label">Audio<br>Analyzer</div>
+                    </button>
+                    
+                    <button class="action-btn" onclick="app.openScanner('flicker')">
+                        <span class="status-indicator" id="statusFlicker"></span>
+                        <div class="action-icon">💡</div>
+                        <div class="action-label">Light<br>Flicker</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Evidence Log -->
+            <div class="evidence-log" id="evidenceLog" style="display: none;">
+                <h3 style="font-size: 18px; margin-bottom: 12px;">Evidence Log</h3>
+                <div id="evidenceList"></div>
+            </div>
+        </div>
+
+        <!-- IR Scanner View -->
+        <div class="scanner-view" id="irView">
+            <div class="scanner-header">
+                <button class="back-btn" onclick="app.closeScanner()">←</button>
+                <div class="scanner-title">IR Camera Detector</div>
+            </div>
+            <div class="scanner-content">
+                <div class="video-wrapper">
+                    <video id="irVideo" autoplay playsinline></video>
+                    <div class="video-overlay" id="irOverlay">
+                        <div class="overlay-icon">📷</div>
+                        <div class="overlay-text">Turn off all lights for best results</div>
+                        <button class="btn btn-primary" onclick="app.startCamera('ir')">Start IR Detection</button>
+                    </div>
+                    <div class="detection-overlay" id="irDetectionOverlay"></div>
+                </div>
+                
+                <div class="controls hidden" id="irControls">
+                    <button class="btn btn-primary" onclick="app.captureFrame('ir')">📸 Capture Evidence</button>
+                    <button class="btn btn-secondary" onclick="app.toggleFlash()">💡 Flash</button>
+                </div>
+
+                <div id="irAnalysis"></div>
+
+                <div class="warning-card">
+                    <h3>⚠️ Detection Guide</h3>
+                    <ul>
+                        <li>Turn off ALL room lights completely</li>
+                        <li>IR LEDs appear as bright purple/white dots</li>
+                        <li>Move slowly and scan from multiple angles</li>
+                        <li>Check vents, smoke detectors, outlets first</li>
+                        <li>Real IR lights stay constant, not flickering</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>What to Look For</h3>
+                    <ul>
+                        <li>Small bright spots visible only on camera</li>
+                        <li>Purple or white glowing points</li>
+                        <li>Consistent brightness from all angles</li>
+                        <li>Multiple small lights in cluster (camera array)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lens Finder View -->
+        <div class="scanner-view" id="lensView">
+            <div class="scanner-header">
+                <button class="back-btn" onclick="app.closeScanner()">←</button>
+                <div class="scanner-title">Lens Reflection Finder</div>
+            </div>
+            <div class="scanner-content">
+                <div class="video-wrapper">
+                    <video id="lensVideo" autoplay playsinline></video>
+                    <div class="video-overlay" id="lensOverlay">
+                        <div class="overlay-icon">🔍</div>
+                        <div class="overlay-text">Turn on your flashlight</div>
+                        <button class="btn btn-primary" onclick="app.startCamera('lens')">Start Lens Detection</button>
+                    </div>
+                    <div class="detection-overlay" id="lensDetectionOverlay"></div>
+                </div>
+                
+                <div class="controls hidden" id="lensControls">
+                    <button class="btn btn-primary" onclick="app.captureFrame('lens')">📸 Capture Evidence</button>
+                    <button class="btn btn-secondary" onclick="app.analyzeCircular()">🎯 Find Lenses</button>
+                </div>
+
+                <div id="lensAnalysis"></div>
+
+                <div class="warning-card">
+                    <h3>⚠️ Detection Guide</h3>
+                    <ul>
+                        <li>Turn ON phone flashlight for best results</li>
+                        <li>Hold phone at 45° angle to surfaces</li>
+                        <li>Camera lenses create circular bright spots</li>
+                        <li>Move slowly and watch for consistent reflections</li>
+                        <li>Check same spot from multiple angles</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>Priority Check Locations</h3>
+                    <ul>
+                        <li>Smoke detectors (most common hiding spot)</li>
+                        <li>Digital clocks and alarm clocks</li>
+                        <li>USB chargers and power adapters</li>
+                        <li>Picture frames facing sensitive areas</li>
+                        <li>Air vents and grilles</li>
+                        <li>Decorative items on shelves</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audio Analyzer View -->
+        <div class="scanner-view" id="audioView">
+            <div class="scanner-header">
+                <button class="back-btn" onclick="app.closeScanner()">←</button>
+                <div class="scanner-title">Audio Spectrum Analyzer</div>
+            </div>
+            <div class="scanner-content">
+                <div class="visualizer-container">
+                    <canvas id="audioCanvas"></canvas>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" id="audioStartBtn" onclick="app.startAudioAnalysis()">🎙️ Start Listening</button>
+                    <button class="btn btn-secondary hidden" id="audioStopBtn" onclick="app.stopAudioAnalysis()">⏹️ Stop</button>
+                </div>
+
+                <div id="audioAnalysis"></div>
+
+                <div class="warning-card">
+                    <h3>⚠️ Detection Guide</h3>
+                    <ul>
+                        <li>Turn off music, TV, and other noise sources</li>
+                        <li>Some bugs emit ultrasonic frequencies (18-22 kHz)</li>
+                        <li>Look for consistent high-frequency patterns</li>
+                        <li>Move slowly around room while monitoring</li>
+                        <li>Spikes in specific frequencies may indicate devices</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>Frequency Guide</h3>
+                    <ul>
+                        <li>0-4 kHz: Human voice and ambient noise</li>
+                        <li>4-10 kHz: Normal environmental sounds</li>
+                        <li>10-18 kHz: Edge of human hearing</li>
+                        <li>18-22 kHz: Ultrasonic range (bugs/devices)</li>
+                        <li>Watch for consistent narrow-band signals</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flicker Detector View -->
+        <div class="scanner-view" id="flickerView">
+            <div class="scanner-header">
+                <button class="back-btn" onclick="app.closeScanner()">←</button>
+                <div class="scanner-title">Light Flicker Detector</div>
+            </div>
+            <div class="scanner-content">
+                <div class="video-wrapper">
+                    <video id="flickerVideo" autoplay playsinline></video>
+                    <div class="video-overlay" id="flickerOverlay">
+                        <div class="overlay-icon">💡</div>
+                        <div class="overlay-text">Detect invisible pulsing lights</div>
+                        <button class="btn btn-primary" onclick="app.startCamera('flicker')">Start Analysis</button>
+                    </div>
+                </div>
+                
+                <div class="controls hidden" id="flickerControls">
+                    <button class="btn btn-primary" onclick="app.analyzeFlicker()">📊 Analyze Flicker</button>
+                    <button class="btn btn-secondary" onclick="app.captureFrame('flicker')">📸 Capture</button>
+                </div>
+
+                <div id="flickerAnalysis"></div>
+
+                <div class="warning-card">
+                    <h3>⚠️ Detection Guide</h3>
+                    <ul>
+                        <li>Some IR cameras pulse at specific frequencies</li>
+                        <li>Human eyes can't see this, but cameras can</li>
+                        <li>Point camera at suspected devices</li>
+                        <li>Look for rhythmic brightness changes</li>
+                        <li>Common frequencies: 30Hz, 50Hz, 60Hz</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>What Flicker Means</h3>
+                    <ul>
+                        <li>Normal lights: Minimal flicker or 50/60Hz (power)</li>
+                        <li>LED lights: May show high-frequency flicker</li>
+                        <li>IR cameras: Often pulse at 30-60Hz</li>
+                        <li>Suspicious: Consistent non-standard frequencies</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = (function() {
+            let currentScanner = null;
+            let cameraStream = null;
+            let audioContext = null;
+            let audioAnalyser = null;
+            let audioSource = null;
+            let animationFrame = null;
+            let evidence = [];
+            let flashEnabled = false;
+            let brightnessHistory = [];
+            let analysisPaused = false;
+
+            function addEvidence(type, message, level) {
+                const item = {
+                    type: type,
+                    message: message,
+                    level: level,
+                    timestamp: new Date().toLocaleTimeString(),
+                    id: Date.now()
+                };
+                
+                evidence.unshift(item);
+                if (evidence.length > 50) evidence.pop();
+                
+                updateEvidenceLog();
+                updateThreatLevel();
+                
+                if (level === 'high' && navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]);
+                } else if (level === 'medium' && navigator.vibrate) {
+                    navigator.vibrate(150);
+                }
+            }
+
+            function updateEvidenceLog() {
+                const log = document.getElementById('evidenceLog');
+                const list = document.getElementById('evidenceList');
+                
+                if (evidence.length === 0) {
+                    log.style.display = 'none';
+                    return;
+                }
+                
+                log.style.display = 'block';
+                list.innerHTML = evidence.map(function(item) {
+                    return '<div class="evidence-item ' + item.level + '">' +
+                        '<div class="evidence-info">' +
+                        '<div class="evidence-type">' + item.type + '</div>' +
+                        '<div class="evidence-message">' + item.message + '</div>' +
+                        '<div class="evidence-time">' + item.timestamp + '</div>' +
+                        '</div>' +
+                        '<button class="evidence-action" onclick="app.viewEvidence(' + item.id + ')">View</button>' +
+                        '</div>';
+                }).join('');
+            }
+
+            function updateThreatLevel() {
+                const threatEl = document.getElementById('threatLevel');
+                const highThreats = evidence.filter(function(e) { return e.level === 'high'; }).length;
+                const mediumThreats = evidence.filter(function(e) { return e.level === 'medium'; }).length;
+                
+                if (highThreats > 0) {
+                    threatEl.className = 'threat-level threat-danger';
+                    threatEl.innerHTML = 
+                        '<div class="threat-icon">⚠️</div>' +
+                        '<h2>High Alert</h2>' +
+                        '<p>' + highThreats + ' critical finding(s)</p>';
+                } else if (mediumThreats > 0) {
+                    threatEl.className = 'threat-level threat-warning';
+                    threatEl.innerHTML = 
+                        '<div class="threat-icon">⚡</div>' +
+                        '<h2>Suspicious Activity</h2>' +
+                        '<p>' + mediumThreats + ' potential threat(s)</p>';
+                } else {
+                    threatEl.className = 'threat-level threat-safe';
+                    threatEl.innerHTML = 
+                        '<div class="threat-icon">✓</div>' +
+                        '<h2>Environment Secure</h2>' +
+                        '<p>' + evidence.length + ' scan(s) completed</p>';
+                }
+            }
+
+            function openScanner(type) {
+                closeScanner();
+                currentScanner = type;
+                document.getElementById('dashboard').style.display = 'none';
+                document.getElementById(type + 'View').classList.add('active');
+                
+                addEvidence('system', type.toUpperCase() + ' scanner opened', 'low');
+            }
+
+            function closeScanner() {
+                if (currentScanner) {
+                    document.getElementById(currentScanner + 'View').classList.remove('active');
+                    
+                    if (cameraStream) {
+                        cameraStream.getTracks().forEach(track => track.stop());
+                        cameraStream = null;
+                    }
+                    
+                    if (audioContext) {
+                        audioContext.close();
+                        audioContext = null;
+                        audioAnalyser = null;
+                        audioSource = null;
+                    }
+                    
+                    if (animationFrame) {
+                        cancelAnimationFrame(animationFrame);
+                        animationFrame = null;
+                    }
+                    
+                    currentScanner = null;
+                }
+                
+                document.getElementById('dashboard').style.display = 'block';
+            }
+
+            async function startCamera(type) {
+                try {
+                    const constraints = {
+                        video: {
+                            facingMode: 'environment',
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        }
+                    };
+
+                    cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    const video = document.getElementById(type + 'Video');
+                    video.srcObject = cameraStream;
+                    
+                    document.getElementById(type + 'Overlay').classList.add('hidden');
+                    document.getElementById(type + 'Controls').classList.remove('hidden');
+                    
+                    addEvidence('camera', 'Camera started for ' + type + ' detection', 'low');
+                    
+                    if (type === 'ir' || type === 'lens') {
+                        startVideoAnalysis(type, video);
+                    }
+                    
+                } catch (error) {
+                    alert('Camera access denied. Please enable camera permissions in your browser settings.');
+                    console.error('Camera error:', error);
+                }
+            }
+
+            function startVideoAnalysis(type, video) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                function analyze() {
+                    if (!cameraStream || analysisPaused) {
+                        animationFrame = requestAnimationFrame(analyze);
+                        return;
+                    }
+                    
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0);
+                    
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    
+                    if (type === 'ir') {
+                        analyzeIRFrame(imageData, canvas.width, canvas.height);
+                    } else if (type === 'lens') {
+                        analyzeLensFrame(imageData, canvas.width, canvas.height);
+                    }
+                    
+                    animationFrame = requestAnimationFrame(analyze);
+                }
+                
+                analyze();
+            }
+
+            function analyzeIRFrame(imageData, width, height) {
+                const data = imageData.data;
+                const threshold = 220;
+                let brightSpots = [];
+                
+                for (let y = 0; y < height; y += 20) {
+                    for (let x = 0; x < width; x += 20) {
+                        const i = (y * width + x) * 4;
+                        const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                        
+                        if (brightness > threshold) {
+                            brightSpots.push({ x, y, brightness });
+                        }
+                    }
+                }
+                
+                if (brightSpots.length > 3) {
+                    const overlay = document.getElementById('irDetectionOverlay');
+                    overlay.innerHTML = brightSpots.slice(0, 10).map(spot => 
+                        `<div class="detection-marker" style="left: ${(spot.x/width)*100}%; top: ${(spot.y/height)*100}%; width: 30px; height: 30px;"></div>`
+                    ).join('');
+                    
+                    if (brightSpots.length > 5) {
+                        const result = document.getElementById('irAnalysis');
+                        result.innerHTML = `
+                            <div class="analysis-result">
+                                <div class="result-header">
+                                    <span style="font-weight: 600;">IR Detection</span>
+                                    <span class="result-status result-warning">⚠️ SUSPICIOUS</span>
+                                </div>
+                                <div class="result-data">
+                                    Detected ${brightSpots.length} bright spots.<br>
+                                    Average brightness: ${Math.round(brightSpots.reduce((a,b) => a + b.brightness, 0) / brightSpots.length)}<br>
+                                    <strong>Possible IR camera LEDs detected</strong>
+                                </div>
+                            </div>
+                        `;
+                        
+                        if (brightSpots.length > 8) {
+                            addEvidence('IR Detection', `${brightSpots.length} bright spots detected - possible IR camera`, 'high');
+                        }
+                    }
+                }
+            }
+
+            function analyzeLensFrame(imageData, width, height) {
+                const data = imageData.data;
+                const threshold = 200;
+                let reflections = [];
+                
+                for (let y = 20; y < height - 20; y += 15) {
+                    for (let x = 20; x < width - 20; x += 15) {
+                        const center = (y * width + x) * 4;
+                        const centerBright = (data[center] + data[center + 1] + data[center + 2]) / 3;
+                        
+                        if (centerBright > threshold) {
+                            let circularScore = 0;
+                            for (let angle = 0; angle < 360; angle += 45) {
+                                const rad = angle * Math.PI / 180;
+                                const px = Math.round(x + Math.cos(rad) * 10);
+                                const py = Math.round(y + Math.sin(rad) * 10);
+                                const pi = (py * width + px) * 4;
+                                const pBright = (data[pi] + data[pi + 1] + data[pi + 2]) / 3;
+                                
+                                if (pBright > threshold - 30) circularScore++;
+                            }
+                            
+                            if (circularScore >= 6) {
+                                reflections.push({ x, y, score: circularScore });
+                            }
+                        }
+                    }
+                }
+                
+                if (reflections.length > 0) {
+                    const result = document.getElementById('lensAnalysis');
+                    result.innerHTML = `
+                        <div class="analysis-result">
+                            <div class="result-header">
+                                <span style="font-weight: 600;">Lens Detection</span>
+                                <span class="result-status result-warning">⚠️ REFLECTIONS FOUND</span>
+                            </div>
+                            <div class="result-data">
+                                Detected ${reflections.length} circular reflection(s).<br>
+                                <strong>Possible camera lens reflections</strong><br>
+                                Move closer to confirm.
+                            </div>
+                        </div>
+                    `;
+                    
+                    if (reflections.length >= 2) {
+                        addEvidence('Lens Detection', `${reflections.length} lens-like reflections found`, 'medium');
+                    }
+                }
+            }
+
+            function captureFrame(type) {
+                const video = document.getElementById(type + 'Video');
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0);
+                
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    addEvidence('capture', 'Photo captured from ' + type + ' scanner', 'medium');
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'safespace-' + type + '-' + Date.now() + '.jpg';
+                    a.click();
+                });
+            }
+
+            async function toggleFlash() {
+                if (!cameraStream) return;
+                
+                const track = cameraStream.getVideoTracks()[0];
+                const capabilities = track.getCapabilities();
+                
+                if (capabilities.torch) {
+                    flashEnabled = !flashEnabled;
+                    try {
+                        await track.applyConstraints({
+                            advanced: [{ torch: flashEnabled }]
+                        });
+                        addEvidence('flash', 'Flash ' + (flashEnabled ? 'enabled' : 'disabled'), 'low');
+                    } catch(e) {
+                        alert('Flash control not available on this device');
+                    }
+                } else {
+                    alert('Flash not available on this device');
+                }
+            }
+
+            async function startAudioAnalysis() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    audioAnalyser = audioContext.createAnalyser();
+                    audioSource = audioContext.createMediaStreamSource(stream);
+                    
+                    audioAnalyser.fftSize = 2048;
+                    audioSource.connect(audioAnalyser);
+                    
+                    document.getElementById('audioStartBtn').classList.add('hidden');
+                    document.getElementById('audioStopBtn').classList.remove('hidden');
+                    
+                    visualizeAudio();
+                    addEvidence('audio', 'Audio analysis started', 'low');
+                    
+                } catch (error) {
+                    alert('Microphone access denied. Please enable microphone permissions.');
+                    console.error('Audio error:', error);
+                }
+            }
+
+            function visualizeAudio() {
+                const canvas = document.getElementById('audioCanvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = canvas.offsetWidth;
+                canvas.height = 200;
+                
+                const bufferLength = audioAnalyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                
+                function draw() {
+                    if (!audioAnalyser) return;
+                    
+                    animationFrame = requestAnimationFrame(draw);
+                    audioAnalyser.getByteFrequencyData(dataArray);
+                    
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    const barWidth = (canvas.width / bufferLength) * 2.5;
+                    let x = 0;
+                    
+                    let ultrasonicLevel = 0;
+                    const ultrasonicStart = Math.floor(bufferLength * 0.8);
+                    
+                    for (let i = 0; i < bufferLength; i++) {
+                        const barHeight = (dataArray[i] / 255) * canvas.height;
+                        
+                        let color = '#3b82f6';
+                        if (i > ultrasonicStart) {
+                            color = '#ef4444';
+                            ultrasonicLevel += dataArray[i];
+                        } else if (i > bufferLength * 0.5) {
+                            color = '#f59e0b';
+                        }
+                        
+                        ctx.fillStyle = color;
+                        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                        x += barWidth + 1;
+                    }
+                    
+                    if (ultrasonicLevel > 2000) {
+                        const result = document.getElementById('audioAnalysis');
+                        result.innerHTML = `
+                            <div class="analysis-result">
+                                <div class="result-header">
+                                    <span style="font-weight: 600;">Audio Analysis</span>
+                                    <span class="result-status result-warning">⚠️ ULTRASONIC DETECTED</span>
+                                </div>
+                                <div class="result-data">
+                                    High ultrasonic activity detected (18-22 kHz)<br>
+                                    Level: ${Math.round(ultrasonicLevel)}<br>
+                                    <strong>Possible surveillance device</strong>
+                                </div>
+                            </div>
+                        `;
+                        
+                        addEvidence('audio', 'Ultrasonic frequency detected: ' + Math.round(ultrasonicLevel), 'high');
+                    }
+                }
+                
+                draw();
+            }
+
+            function stopAudioAnalysis() {
+                if (audioContext) {
+                    audioContext.close();
+                    audioContext = null;
+                    audioAnalyser = null;
+                    audioSource = null;
+                }
+                
+                if (animationFrame) {
+                    cancelAnimationFrame(animationFrame);
+                    animationFrame = null;
+                }
+                
+                document.getElementById('audioStartBtn').classList.remove('hidden');
+                document.getElementById('audioStopBtn').classList.add('hidden');
+                
+                addEvidence('audio', 'Audio analysis stopped', 'low');
+            }
+
+            function analyzeFlicker() {
+                const video = document.getElementById('flickerVideo');
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                brightnessHistory = [];
+                let frameCount = 0;
+                const maxFrames = 60;
+                
+                function captureFrame() {
+                    if (frameCount >= maxFrames) {
+                        analyzeFlickerPattern();
+                        return;
+                    }
+                    
+                    ctx.drawImage(video, 0, 0);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    
+                    let totalBrightness = 0;
+                    for (let i = 0; i < data.length; i += 4) {
+                        totalBrightness += (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    }
+                    
+                    brightnessHistory.push(totalBrightness / (data.length / 4));
+                    frameCount++;
+                    
+                    requestAnimationFrame(captureFrame);
+                }
+                
+                captureFrame();
+                addEvidence('flicker', 'Analyzing light flicker pattern...', 'low');
+            }
+
+            function analyzeFlickerPattern() {
+                if (brightnessHistory.length < 30) return;
+                
+                const mean = brightnessHistory.reduce((a, b) => a + b) / brightnessHistory.length;
+                const variance = brightnessHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / brightnessHistory.length;
+                const stdDev = Math.sqrt(variance);
+                
+                let periodicScore = 0;
+                for (let period = 2; period < 20; period++) {
+                    let correlation = 0;
+                    for (let i = 0; i < brightnessHistory.length - period; i++) {
+                        if (Math.abs(brightnessHistory[i] - brightnessHistory[i + period]) < stdDev * 0.5) {
+                            correlation++;
+                        }
+                    }
+                    if (correlation > brightnessHistory.length * 0.6) {
+                        periodicScore = Math.max(periodicScore, correlation);
+                    }
+                }
+                
+                const result = document.getElementById('flickerAnalysis');
+                let status = 'NORMAL';
+                let level = 'low';
+                let statusClass = 'result-safe';
+                
+                if (stdDev > 15 && periodicScore > 30) {
+                    status = 'PERIODIC FLICKER DETECTED';
+                    level = 'high';
+                    statusClass = 'result-danger';
+                } else if (stdDev > 10) {
+                    status = 'SLIGHT FLICKER';
+                    level = 'medium';
+                    statusClass = 'result-warning';
+                }
+                
+                result.innerHTML = `
+                    <div class="analysis-result">
+                        <div class="result-header">
+                            <span style="font-weight: 600;">Flicker Analysis</span>
+                            <span class="result-status ${statusClass}">${status}</span>
+                        </div>
+                        <div class="result-data">
+                            Standard deviation: ${stdDev.toFixed(2)}<br>
+                            Periodic score: ${periodicScore}<br>
+                            ${periodicScore > 30 ? '<strong>Suspicious periodic pattern detected</strong>' : 'No suspicious patterns'}
+                        </div>
+                    </div>
+                `;
+                
+                addEvidence('flicker', `Analysis complete: ${status}`, level);
+            }
+
+            function analyzeCircular() {
+                addEvidence('lens', 'Analyzing for circular lens patterns...', 'medium');
+                alert('Keep camera steady and pointed at suspect area for best results');
+            }
+
+            function viewEvidence(id) {
+                const item = evidence.find(e => e.id === id);
+                if (item) {
+                    alert(`${item.type}\n${item.message}\n${item.timestamp}`);
+                }
+            }
+
+            return {
+                openScanner,
+                closeScanner,
+                startCamera,
+                captureFrame,
+                toggleFlash,
+                startAudioAnalysis,
+                stopAudioAnalysis,
+                analyzeFlicker,
+                analyzeCircular,
+                viewEvidence
+            };
+        })();
+    </script>
+</body>
+</html>
